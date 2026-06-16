@@ -87,3 +87,30 @@ def test_predict_conserve_texte_original(model):
     texte = "Ce Produit Est EXCELLENT"
     result = model.predict(texte)
     assert result["text"] == texte
+
+def test_negation_pas_bien_retourne_negative(model):
+    result = model.predict("pas bien")
+    assert result["label"] == "NEGATIVE"
+
+
+def test_negation_jamais_mauvais_retourne_positive(model):
+    result = model.predict("jamais mauvais")
+    assert result["label"] == "POSITIVE"
+
+
+def test_negation_sans_negation_reste_inchange(model):
+    result = model.predict("produit vraiment excellent")
+    assert result["label"] == "POSITIVE"
+
+@pytest.mark.parametrize(
+    "texte, attendu",
+    [
+        ("pas bien", "NEGATIVE"),
+        ("jamais mauvais", "POSITIVE"),
+        ("sans excellent", "NEGATIVE"),
+        ("produit vraiment excellent", "POSITIVE"),
+    ]
+)
+def test_negation_parametrisee(model, texte, attendu):
+    result = model.predict(texte)
+    assert result["label"] == attendu
